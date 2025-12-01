@@ -183,8 +183,7 @@ class MillerMagalhaes extends SeniorEngineer
             <div class="contact-wrapper">
                 <div class="contact-info">
                     <p data-i18n="contact.subtitle">Estou em busca de novos desafios. Vamos conversar sobre como
-                        posso
-                        contribuir com seu projeto.</p>
+                        posso contribuir com seu projeto.</p>
                     <div class="social-links">
                         <a href="https://github.com/millerp" target="_blank" class="social-link"><i
                                 data-lucide="github"></i> <span>github.com/millerp</span></a>
@@ -196,24 +195,40 @@ class MillerMagalhaes extends SeniorEngineer
                         </div>
                     </div>
                 </div>
-                <form class="contact-form" id="contactForm">
+                <form class="contact-form" id="contactForm" action="https://formspree.io/f/mgvgyvqa" method="POST">
                     <div class="form-group">
                         <label for="name" data-i18n="form.name">Nome</label>
-                        <input type="text" id="name" required>
+                        <input type="text" id="name" name="name" required>
                     </div>
                     <div class="form-group">
                         <label for="email" data-i18n="form.email">Email</label>
-                        <input type="email" id="email" required>
+                        <input type="email" id="email" name="email" required>
                     </div>
                     <div class="form-group">
                         <label for="message" data-i18n="form.message">Mensagem</label>
-                        <textarea id="message" rows="5" required></textarea>
+                        <textarea id="message" name="message" rows="5" required></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary" data-i18n="form.send">Enviar Mensagem</button>
                 </form>
             </div>
         </div>
     </section>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Modal -->
+    <div id="feedback-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div class="modal-icon" id="modal-icon"></div>
+            <h3 id="modal-title"></h3>
+            <p id="modal-message"></p>
+            <button class="btn btn-primary" id="modal-btn">OK</button>
+        </div>
+    </div>
 
     <footer>
         <p>&copy; 2025 Miller Magalhães</p>

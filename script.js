@@ -99,14 +99,104 @@ document.addEventListener('DOMContentLoaded', () => {
     langPtBtn.addEventListener('click', () => updateLanguage('pt-BR'));
     langEnBtn.addEventListener('click', () => updateLanguage('en'));
 
-    // Form handling
+    // Form handling with AJAX, Loading and Modal
     const form = document.getElementById('contactForm');
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const msg = currentLang === 'pt-BR'
-            ? 'Obrigado pelo contato! Esta é uma demonstração.'
-            : 'Thanks for contacting! This is a demo.';
-        alert(msg);
-        form.reset();
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const modal = document.getElementById('feedback-modal');
+    const modalIcon = document.getElementById('modal-icon');
+    const modalTitle = document.getElementById('modal-title');
+    const modalMessage = document.getElementById('modal-message');
+    const modalBtn = document.getElementById('modal-btn');
+    const modalClose = document.querySelector('.modal-close');
+
+    function showLoading() {
+        loadingOverlay.classList.add('active');
+        form.style.pointerEvents = 'none';
+        form.style.opacity = '0.6';
+    }
+
+    function hideLoading() {
+        loadingOverlay.classList.remove('active');
+        form.style.pointerEvents = 'auto';
+        form.style.opacity = '1';
+    }
+
+    function showModal(type, title, message) {
+        modalIcon.className = 'modal-icon ' + type;
+        modalTitle.textContent = title;
+        modalMessage.textContent = message;
+        modal.classList.add('active');
+    }
+
+    function hideModal() {
+        modal.classList.remove('active');
+    }
+
+    modalBtn.addEventListener('click', hideModal);
+    modalClose.addEventListener('click', hideModal);
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            hideModal();
+        }
     });
+
+    async function handleSubmit(event) {
+        event.preventDefault();
+        showLoading();
+
+        const data = new FormData(event.target);
+
+        fetch(event.target.action, {
+            method: form.method,
+            body: data,
+            headers: {
+                'Accept': 'application/json'
+            }
+        }).then(response => {
+            hideLoading();
+
+            if (response.ok) {
+                const title = currentLang === 'pt-BR'
+                    ? 'Mensagem Enviada!'
+                    : 'Message Sent!';
+                const message = currentLang === 'pt-BR'
+                    ? 'Obrigado pelo contato! Sua mensagem foi enviada com sucesso e retornarei em breve.'
+                    : 'Thanks for contacting! Your message was sent successfully and I will get back to you soon.';
+
+                showModal('success', title, message);
+                form.reset();
+            } else {
+                response.json().then(data => {
+                    const title = currentLang === 'pt-BR'
+                        ? 'Erro ao Enviar'
+                        : 'Send Error';
+
+                    let message;
+                    if (Object.hasOwn(data, 'errors')) {
+                        message = data["errors"].map(error => error["message"]).join(", ");
+                    } else {
+                        message = currentLang === 'pt-BR'
+                            ? 'Ops! Houve um problema ao enviar sua mensagem. Por favor, tente novamente.'
+                            : 'Oops! There was a problem submitting your form. Please try again.';
+                    }
+
+                    showModal('error', title, message);
+                });
+            }
+        }).catch(error => {
+            hideLoading();
+
+            const title = currentLang === 'pt-BR'
+                ? 'Erro de Conexão'
+                : 'Connection Error';
+            const message = currentLang === 'pt-BR'
+                ? 'Ops! Houve um problema de conexão. Verifique sua internet e tente novamente.'
+                : 'Oops! There was a connection problem. Check your internet and try again.';
+
+            showModal('error', title, message);
+        });
+    }
+
+    form.addEventListener('submit', handleSubmit);
 });
